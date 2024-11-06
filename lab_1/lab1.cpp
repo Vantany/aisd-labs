@@ -76,18 +76,18 @@ public:
     }
 
     Matrix operator+(const Matrix& other) const {
-        if (_rows != other._rows || _cols != other._cols) throw std::logic_error("Невозможно выполнить операцию у матриц разных размеров")
+        if (_rows != other._rows || _cols != other._cols) throw std::logic_error("Невозможно выполнить операцию у матриц разных размеров");
         Matrix result(_rows, _cols, T());
         for (size_t i = 0; i < _rows; i++) {
             for (size_t j = 0; j < _cols; j++) {
-                result._data[i][j] = data[i][j] + other._data[i][j];
+                result._data[i][j] = _data[i][j] + other._data[i][j];
             }
         }
         return result;
     }
 
     Matrix operator-(const Matrix& other) const {
-        return this+(-1*other);
+        return (*this)+(-1*other);
     }
 
     Matrix operator*(const Matrix& other) const {
@@ -96,21 +96,25 @@ public:
         for (size_t i = 0; i < _rows; i++) {
             for (size_t j = 0; j < other._cols; j++) {
                 for (size_t k = 0; k < _cols; k++) {
-                    result._data[i][j] += data[i][k] * other._data[k][j];
+                    result._data[i][j] += _data[i][k] * other._data[k][j];
                 }
             }
         }
         return result;
     }
 
-    Matrix operator*(const T& scalar) const {
-        Matrix result(_rows, _cols, T());
-        for (size_t i = 0; i < _rows; i++) {
-            for (size_t j = 0; j < _cols; j++) {
-                result[i][j] = _data[i][j] * scalar;
+    friend Matrix operator*(const T& scalar, const Matrix& matrix) {
+        Matrix result(matrix._rows, matrix._cols, T());
+        for (size_t i = 0; i < matrix._rows; ++i) {
+            for (size_t j = 0; j < matrix._cols; ++j) {
+                result._data[i][j] = scalar * matrix._data[i][j];
             }
         }
         return result;
+    }
+
+    Matrix operator*(const T& scalar) const {
+        return scalar * (*this);
     }
 
     T trace() const {
@@ -135,7 +139,7 @@ public:
 
 
 int main() {
-    Matrix<float> a(3, 3, 2, 5);
+    Matrix<float> a(3, 3, 2);
     Matrix<float> b(a);
-    std::cout << (a!=b) << std::endl;
+    std::cout << (a*b) << std::endl;
 }
