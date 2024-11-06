@@ -56,7 +56,12 @@ public:
 
     ~Matrix() { deallocateMemory(); }
 
-    T& operator()(int row, int col) {
+    T& operator()(size_t row, size_t col) {
+        if (row < 0 || row >= _rows || col < 0 || col >= _cols) throw std::logic_error("Неккоректный индекс");
+        return _data[row][col];
+    }
+
+    const T& operator()(size_t row, size_t col) const {
         if (row < 0 || row >= _rows || col < 0 || col >= _cols) throw std::logic_error("Неккоректный индекс");
         return _data[row][col];
     }
@@ -137,9 +142,46 @@ public:
     }
 };
 
+template <typename T>
+T det_matrix_3_x_3(const Matrix<T>& matrix) {
+        return matrix(0, 0) * (matrix(1, 1) * matrix(2, 2) - matrix(1, 2) * matrix(2, 1))
+                - matrix(0, 1) * (matrix(1, 0) * matrix(2, 2) - matrix(1, 2) * matrix(2, 0))
+                + matrix(0, 2) * (matrix(1, 0) * matrix(2, 1) - matrix(1, 1) * matrix(2, 0));
+}
+
+
+template <typename T>
+Matrix<T> swap_col_matrix_3_x_3(const Matrix<T>& matrix, const Matrix<T>& col, size_t ind) {
+    Matrix<T> result(matrix);
+    for (size_t i = 0; i < 3; i++) {
+        result(i, ind) = col(i, 0);
+    }
+    return result;
+}
+
+template <typename T>
+Matrix<T> solve_equation(const Matrix<T>& A, const Matrix<T>& b) {
+
+    Matrix<T> result(3, 1, T());
+
+    T det_A = det_matrix_3_x_3<T>(A);
+
+    if (det_A == 0) {
+        throw std::logic_error("Невозможно решить уравнение");
+    }
+
+    for (size_t i = 0; i < 3; i++) {
+        Matrix<T> A_i = swap_col_matrix_3_x_3<T>(A, b, i);
+        result(i, 0) = (det_matrix_3_x_3<T>(A_i)) / det_A;
+    }
+
+    return result;
+}
+
 
 int main() {
-    Matrix<float> a(3, 3, 2);
-    Matrix<float> b(a);
-    std::cout << (a*b) << std::endl;
+    Matrix<int> a(3, 3, 1, 10);
+    Matrix<int> b(3, 1, 1, 10);
+    std::cout << a << "\n" << b << "\n";
+    std::cout << solve_equation<int>(a, b) << "\n";
 }
