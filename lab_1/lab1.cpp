@@ -2,13 +2,13 @@
 #include <complex>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
+#define ACCURACY 0.01
 
 template <typename T>
 class Matrix {
     T** _data;
     size_t _rows, _cols;
-
-public:
 
     void allocateMemory() {
         _data = new T*[_rows];
@@ -23,6 +23,8 @@ public:
         }
         delete[] _data;
     }
+
+public:
 
     Matrix(size_t rows, size_t cols, T val) : _rows(rows), _cols(cols) {
         allocateMemory();
@@ -70,7 +72,7 @@ public:
         if (_rows != other._rows || _cols != other._cols) throw std::logic_error("Вы проверяете на рвенство матрицы разных размеров");
         for (size_t i = 0; i < _rows; i++) {
             for (size_t j = 0; j < _cols; j++) {
-                if (_data[i][j] != other._data[i][j]) return false;
+                if (abs(_data[i][j] - other._data[i][j]) > ACCURACY) return false;
             }
         }
         return true;
@@ -89,7 +91,7 @@ public:
             }
         }
         return result;
-    }
+    }   
 
     Matrix operator-(const Matrix& other) const {
         return (*this)+(-1*other);
@@ -180,8 +182,18 @@ Matrix<T> solve_equation(const Matrix<T>& A, const Matrix<T>& b) {
 
 
 int main() {
-    Matrix<int> a(3, 3, 1, 10);
-    Matrix<int> b(3, 1, 1, 10);
-    std::cout << a << "\n" << b << "\n";
-    std::cout << solve_equation<int>(a, b) << "\n";
+    Matrix<float> a(3, 3, 1, 100);
+    Matrix<float> b(a);
+
+    std::cout << a << "\n";
+    std::cout << b << "\n";
+
+    std::cout << (a==b) << "\n";
+
+    std::cout << a*b << "\n";
+
+    std::cout << (2*a == a*2) << "\n";
+    Matrix<float> c(3, 1, 1, 100);
+    std::cout << c << "\n";
+    std::cout << (a * solve_equation<float>(a, c) == c) << "\n";
 }
