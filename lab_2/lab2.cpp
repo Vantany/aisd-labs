@@ -68,6 +68,21 @@ public:
         return *this;
     }
 
+    bool operator==(const LinkedList& other) const {
+        if (size != other.size) return false;
+
+        Node* current = tail->next;
+        Node* otherCurrent = other.tail->next;
+        do {
+            if (current->data != otherCurrent->data) return false;
+            current = current->next;
+            otherCurrent = otherCurrent->next;
+        } while (current != tail->next);
+
+        return true;
+
+    }
+
     void push_tail(const T& value) {
         Node* newNode = new Node(value);
         if (tail == nullptr) {
@@ -307,8 +322,11 @@ int main() {
     number1.push_tail(1);
 
     LinkedList<int> number2;
-    number2.push_tail(4);
-    number2.push_tail(3);
+    number2.push_tail(2);
+    number2.push_tail(1);
+    number2.push_tail(1);
+
+    std::cout << (number1==number2) << std::endl;
 
     LinkedList<int> result = LinkedList<int>::multiply(number1, number2);
 
