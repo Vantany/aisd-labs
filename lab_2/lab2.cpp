@@ -26,8 +26,7 @@ private:
             : data(value), next(nextNode) {}
     };
 
-    Node* tail;
-    size_t size;
+
 
     void copyFrom(const LinkedList& other) {
         if (other.tail == nullptr) return;
@@ -40,6 +39,8 @@ private:
     }
 
 public:
+    Node* tail;
+    size_t size;
     LinkedList() : tail(nullptr), size(0) {}
 
     LinkedList(const LinkedList& other) : tail(nullptr), size(0) {
@@ -83,6 +84,10 @@ public:
 
     }
 
+    bool operator!=(const LinkedList& other) const {
+        return !(*this == other);
+    }
+
     void push_tail(const T& value) {
         Node* newNode = new Node(value);
         if (tail == nullptr) {
@@ -121,17 +126,30 @@ public:
     void push_head(const LinkedList& other) {
         if (other.tail == nullptr) return;
 
-        LinkedList temp(other);
-        if (tail == nullptr) {
-            tail = temp.tail;
-        } else {
-            Node* current = temp.tail->next;
-            Node* tempTail = temp.tail;
+        Node* otherHead = other.tail->next;
+        Node* temp = otherHead;
+        Node* newHead = nullptr;
+        Node* newTail = nullptr;
 
-            tempTail->next = tail->next;
-            tail->next = current;
+        do {
+            Node* newNode = new Node(temp->data);
+            if(!newHead) {
+                newHead = newNode;
+                newTail = newNode;
+            } else {
+                newTail->next = newNode;
+                newTail = newNode;
+            }
+            temp = temp->next;
+        } while (temp != otherHead);
+        newTail->next = newHead;
+        if(!tail) {
+            tail = newTail;
+            return;
         }
-        size += other.size;
+
+        newTail->next = tail->next;
+        tail->next = newHead;
     }
 
     void pop_head() {
@@ -314,6 +332,9 @@ int main() {
     std::cout << "Number 1: " << number1 << std::endl;
     std::cout << "Number 2: " << number2 << std::endl;
     std::cout << "Sum: " << result << std::endl;
+
+    number1.push_head(number2);
+    std::cout << number1 << std::endl;
     }
 
     {
@@ -323,7 +344,6 @@ int main() {
 
     LinkedList<int> number2;
     number2.push_tail(2);
-    number2.push_tail(1);
     number2.push_tail(1);
 
     std::cout << (number1==number2) << std::endl;
