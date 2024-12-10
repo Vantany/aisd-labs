@@ -9,6 +9,12 @@
 struct stats {
     size_t comparison_count = 0;
     size_t copy_count = 0;
+
+    stats& operator += (const stats& other) {
+        comparison_count += other.comparison_count;
+        copy_count += other.copy_count;
+        return *this;
+    }
 };
 
 // Insertion Sort
@@ -136,9 +142,9 @@ void analyze_for_size(int size, std::ofstream& outFile) {
         auto arr2 = arr1;
         auto arr3 = arr1;
         
-        avg_insertion = insertion_sort(arr1);
-        avg_comb = comb_sort(arr2);
-        avg_quick = quick_sort(arr3);
+        avg_insertion += insertion_sort(arr1);
+        avg_comb += comb_sort(arr2);
+        avg_quick += quick_sort(arr3);
     }
     
     avg_insertion.comparison_count /= 100;
@@ -195,7 +201,7 @@ int main() {
             << "Quick_Worst_Comp,Quick_Worst_Copy\n";
     
     // Analyze for different sizes
-    std::vector<int> sizes = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 25000, 50000, 100000};
+    std::vector<int> sizes = {1000, 2000, 3000, 4000, 5000}; //, 6000, 7000, 8000, 9000, 10000, 25000, 50000, 100000
     
     for (int size : sizes) {
         std::cout << "Analyzing for size: " << size << std::endl;
